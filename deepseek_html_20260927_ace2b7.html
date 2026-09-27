@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>個人學習概括 · Study Hub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f5f6; --card:#ffffff; --border:#e5e5e9; --text:#17171a; --muted:#74747e;
+  --accent:#3b6ef5; --sidebar:#ffffff; --hover:#f1f1f4; --danger:#e5484d; --ok:#22a06b;
+  --warn:#e8a33d; --radius:12px;
+}
+html[data-theme="dark"]{
+  --bg:#101013; --card:#18181c; --border:#2a2a32; --text:#ececf1; --muted:#8f8f9c;
+  --accent:#5b86f7; --sidebar:#151519; --hover:#22222a; --danger:#f2686c; --ok:#3ecf8e;
+  --warn:#e8a33d;
+}
+html,body{height:100%}
+body{
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang TC","PingFang SC","Microsoft JhengHei","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;line-height:1.55;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+a{color:var(--accent)}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px}
+::-webkit-scrollbar-track{background:transparent}
+
+#app{display:flex;min-height:100vh}
+#sidebar{
+  width:232px;background:var(--sidebar);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:60;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px}
+.brand-icon{font-size:22px}
+.brand-title{font-size:15px;font-weight:600;letter-spacing:.02em}
+.brand-sub{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+#nav{flex:1;overflow-y:auto;padding:4px 10px 10px;display:flex;flex-direction:column;gap:2px}
+.nav-item{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;cursor:pointer;
+  color:var(--muted);font-size:13.5px;border:none;background:none;width:100%;text-align:left;
+  transition:background .13s,color .13s;
+}
+.nav-item .ni-en{font-size:10.5px;opacity:.7;margin-left:auto;letter-spacing:.02em}
+.nav-item:hover{background:var(--hover);color:var(--text)}
+.nav-item.active{background:var(--accent);color:#fff}
+.nav-item.active .ni-en{opacity:.8}
+.sidebar-foot{padding:10px;border-top:1px solid var(--border)}
+#main{flex:1;margin-left:232px;min-width:0;display:flex;flex-direction:column}
+
+#topbar{
+  position:sticky;top:0;z-index:40;background:var(--bg);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;padding:10px 18px;min-height:56px;
+}
+#pageTitle{font-size:15px;font-weight:600}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pill{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;
+  border:1px solid var(--border);background:var(--card);font-size:12px;color:var(--muted);white-space:nowrap;
+}
+.pill.ok{color:var(--ok);border-color:var(--ok)}
+.pill.err{color:var(--danger);border-color:var(--danger)}
+.pill.pomo{cursor:pointer;user-select:none;color:var(--text);font-variant-numeric:tabular-nums}
+.pill.pomo.running{color:var(--accent);border-color:var(--accent)}
+#menuBtn{display:none}
+
+#content{padding:18px;max-width:1180px;width:100%;margin:0 auto;flex:1}
+.view{display:none}
+.view.active{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+h3{font-size:13.5px;font-weight:600;margin-bottom:12px;letter-spacing:.01em}
+.muted{color:var(--muted);font-size:12.5px}
+.grow{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.row{display:flex;gap:8px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.grid2>.card{margin-bottom:0}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:10px;
+  border:1px solid var(--border);background:var(--card);color:var(--text);font-size:13px;cursor:pointer;
+  transition:background .13s,filter .13s;white-space:nowrap;
+}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.1);background:var(--accent)}
+.btn.danger{color:var(--danger)}
+.btn.danger:hover{background:color-mix(in srgb,var(--danger) 10%,transparent)}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:8px}
+.btn.full{width:100%}
+.icon-btn{
+  border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:8px;
+  width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;padding:0;
+}
+.icon-btn:hover{background:var(--hover);color:var(--text)}
+input,select,textarea{
+  padding:8px 11px;border-radius:10px;border:1px solid var(--border);background:var(--card);
+  color:var(--text);outline:none;width:100%;font-size:13px;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+label.fl{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px;letter-spacing:.03em}
+.field{margin-bottom:10px}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.list-row{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.list-row:last-child{border-bottom:none}
+.tag{
+  display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;
+  border:1px solid var(--border);color:var(--muted);
+}
+.due-tag{padding:2px 8px;border-radius:6px;font-size:11px;border:1px solid var(--border);color:var(--muted);white-space:nowrap}
+.due-tag.overdue{color:var(--danger);border-color:var(--danger)}
+.due-tag.urgent{color:var(--warn);border-color:var(--warn)}
+.empty{padding:20px 0;text-align:center;color:var(--muted);font-size:12.5px}
+
+/* 主控台 */
+.dash-hero{
+  display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;
+  padding:22px 24px;margin-bottom:14px;border-radius:var(--radius);
+  background:var(--card);border:1px solid var(--border);
+}
+.dash-hero h2{font-size:21px;font-weight:800;letter-spacing:-.3px;line-height:1.3}
+.dash-hero .sub{font-size:12.5px;color:var(--muted);margin-top:5px}
+.dash-hero .hero-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.dash-hero .hero-chips span{font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--hover);border:1px solid var(--border);color:var(--muted)}
+.ring-wrap{position:relative;width:98px;height:98px;flex:0 0 98px}
+.ring{width:98px;height:98px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:5;stroke-linecap:round}
+.ring .bg{stroke:var(--border)}
+.ring .fg{stroke:var(--accent);transition:stroke-dasharray .7s cubic-bezier(.4,0,.2,1)}
+.ring-label{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring-label b{font-size:21px;font-weight:800;line-height:1;letter-spacing:-.5px}
+.ring-label small{font-size:9px;color:var(--muted);letter-spacing:.8px;font-weight:650;display:block;margin-top:3px}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.stat{padding:14px 16px;margin-bottom:0;display:flex;align-items:center;gap:12px}
+.stat-icon{width:38px;height:38px;flex:0 0 38px;border-radius:10px;display:grid;place-items:center;font-size:17px;background:var(--hover)}
+.stat-num{font-size:22px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.stat-label{font-size:11px;color:var(--muted);margin-top:1px}
+
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dash-grid>.card{margin-bottom:0}
+@media(max-width:820px){.dash-grid{grid-template-columns:1fr}}
+
+/* 待辦一週 */
+.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+.day-col{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:11px;display:flex;flex-direction:column;min-height:190px}
+.day-col.today{border-color:var(--accent)}
+.day-head{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.day-head .dd{font-size:10.5px;color:var(--muted);font-weight:400}
+.day-col.today .day-head{color:var(--accent)}
+.task{display:flex;align-items:flex-start;gap:6px;font-size:12.5px;padding:4px 0;line-height:1.4}
+.task input[type=checkbox]{width:14px;height:14px;flex-shrink:0;margin-top:2px;accent-color:var(--accent);cursor:pointer}
+.task.done span.tx{text-decoration:line-through;color:var(--muted)}
+.task .tx{flex:1;word-break:break-word}
+.task .del{opacity:.35;cursor:pointer;font-size:11px;padding:0 2px;background:none;border:none;color:inherit}
+.task .del:hover{opacity:1;color:var(--danger)}
+.day-add{display:flex;gap:4px;margin-top:auto;padding-top:8px}
+.day-add input{padding:5px 8px;font-size:12px;border-radius:8px}
+.day-add button{padding:0 9px;border-radius:8px;border:1px solid var(--border);background:var(--card);cursor:pointer}
+.day-add button:hover{background:var(--hover)}
+@media(max-width:900px){.week-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.week-grid{grid-template-columns:1fr}}
+
+/* 作業/考試 */
+.status-sel{padding:4px 8px;border-radius:8px;font-size:11.5px;width:auto}
+.s-prog{background:var(--border);border-radius:999px;height:6px;overflow:hidden;margin-top:8px}
+.s-prog>i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .25s}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;padding:0;height:22px}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:var(--border)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);margin-top:-5px;cursor:pointer}
+input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:var(--border)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border:none;border-radius:50%;background:var(--accent);cursor:pointer}
+
+/* 表格 */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th,.tbl td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl th{color:var(--muted);font-weight:500;font-size:11.5px;white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* 減壓空間 */
+#view-detox{--dx-bg:#1c1024;--dx-card:#26162f;--dx-border:#3d2449;--dx-text:#f2e8f7;--dx-muted:#a98cbb;--dx-accent:#e07bb0}
+.detox-wrap{background:var(--dx-bg);border:1px solid var(--dx-border);border-radius:16px;padding:20px;color:var(--dx-text)}
+.detox-wrap h2{font-size:17px;font-weight:600;letter-spacing:.02em}
+.detox-wrap h2 span{font-size:11px;color:var(--dx-muted);font-weight:400;letter-spacing:.1em;margin-left:6px;text-transform:uppercase}
+.detox-wrap h3{color:var(--dx-text)}
+.detox-hero{margin-bottom:18px}
+.detox-hero p{color:var(--dx-muted);font-size:12.5px;margin-top:5px}
+.dx-card{background:var(--dx-card);border:1px solid var(--dx-border);border-radius:12px;padding:16px;margin-bottom:14px}
+.dx-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:820px){.dx-grid{grid-template-columns:1fr}}
+.quote-box{min-height:110px;display:flex;flex-direction:column;justify-content:center;gap:8px;padding:18px;border-radius:12px;background:#22122b;border:1px solid var(--dx-border)}
+.quote-zh{font-size:17px;line-height:1.6;letter-spacing:.01em}
+.quote-en{font-size:12.5px;color:var(--dx-muted);font-style:italic}
+.detox-wrap textarea{background:#22122b;border-color:var(--dx-border);color:var(--dx-text)}
+.detox-wrap textarea:focus{border-color:var(--dx-accent)}
+.detox-wrap textarea::placeholder{color:#7d6590}
+.dx-btn{padding:8px 14px;border-radius:10px;border:1px solid var(--dx-border);background:#2e1a39;color:var(--dx-text);cursor:pointer;font-size:13px;transition:.13s;display:inline-flex;align-items:center;gap:6px}
+.dx-btn:hover{background:#3a2147;border-color:var(--dx-accent)}
+.audio-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--dx-border);font-size:13px}
+.audio-row:last-child{border-bottom:none}
+.audio-row .an{width:78px;flex-shrink:0}
+.audio-row input[type=range]{flex:1}
+.audio-toggle{width:46px;height:24px;border-radius:999px;border:1px solid var(--dx-border);background:#2a1733;position:relative;cursor:pointer;flex-shrink:0;padding:0;transition:.16s}
+.audio-toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#8c74a0;transition:.16s}
+.audio-toggle.on{background:var(--dx-accent);border-color:var(--dx-accent)}
+.audio-toggle.on::after{left:24px;background:#fff}
+#bubbleCanvas,#burnCanvas{width:100%;display:block;border-radius:12px;touch-action:manipulation}
+#bubbleCanvas{background:#1a0f21;border:1px solid var(--dx-border);height:340px;cursor:pointer}
+#burnCanvas{position:fixed;inset:0;width:100vw;height:100vh;z-index:900;pointer-events:none;border-radius:0}
+
+#toasts{position:fixed;right:16px;bottom:16px;z-index:1000;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.toast{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 15px;font-size:13px;animation:tin .2s ease;max-width:78vw}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+.toast.ok{border-color:var(--ok);color:var(--ok)}
+.toast.out{opacity:0;transform:translateY(6px);transition:.28s}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+#overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:55}
+@media(max-width:880px){
+  #sidebar{transform:translateX(-100%);transition:transform .22s ease;box-shadow:none}
+  #sidebar.open{transform:none}
+  #main{margin-left:0}
+  #menuBtn{display:inline-flex}
+  #overlay.show{display:block}
+  #content{padding:14px}
+  .topbar-right .pill:not(.pomo){display:none}
+  #pageTitle{font-size:14px}
+  .dash-hero{padding:18px}
+  .ring-wrap{width:80px;height:80px;flex-basis:80px}
+  .ring{width:80px;height:80px}
+}
+@media(max-width:520px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  #topbar{padding:8px 12px}
+  .dash-hero h2{font-size:18px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <div class="brand">
+      <span class="brand-icon">📖</span>
+      <div>
+        <div class="brand-title">學習概括</div>
+        <div class="brand-sub">Study Hub</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="sidebar-foot">
+      <button class="btn full" id="themeBtn">🌙 深色模式</button>
+    </div>
+  </aside>
+  <div id="overlay"></div>
+  <div id="main">
+    <header id="topbar">
+      <button class="icon-btn" id="menuBtn" aria-label="menu">☰</button>
+      <h1 id="pageTitle">主控台</h1>
+      <div class="topbar-right">
+        <span class="pill" id="syncPill">● 僅本地</span>
+        <span class="pill" id="datePill"></span>
+        <span class="pill pomo" id="pomoPill" title="點擊開始 / 暫停">🍅 <span id="pomoTime">25:00</span></span>
+        <button class="icon-btn" id="pomoReset" title="重置番茄鐘">↺</button>
+      </div>
+    </header>
+    <div id="content">
+      <section class="view" id="view-dashboard"></section>
+      <section class="view" id="view-todos"></section>
+      <section class="view" id="view-homework"></section>
+      <section class="view" id="view-exams"></section>
+      <section class="view" id="view-feedback"></section>
+      <section class="view" id="view-grades"></section>
+      <section class="view" id="view-detox"></section>
+      <section class="view" id="view-guide"></section>
+      <section class="view" id="view-settings"></section>
+    </div>
+  </div>
+</div>
+<div id="toasts"></div>
+<canvas id="burnCanvas" hidden></canvas>
+
+<script>
+/* ==================================================================
+   0. 工具函式
+   ================================================================== */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fmtDate(d){ const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${dd}`; }
+function parseDate(s){ return new Date(s + 'T00:00:00'); }
+function addDays(s, n){ const d = parseDate(s); d.setDate(d.getDate() + n); return fmtDate(d); }
+const todayStr = () => fmtDate(new Date());
+function startOfWeek(base = new Date()){
+  const d = new Date(base); d.setHours(0,0,0,0);
+  const wd = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - wd);
+  return fmtDate(d);
+}
+function daysUntil(dateStr){ const d = parseDate(dateStr); const t = new Date(); t.setHours(0,0,0,0); return Math.round((d - t) / 86400000); }
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+function toast(msg, type = ''){
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 2600);
+}
+
+/* ==================================================================
+   1. 資料層
+   ================================================================== */
+const LS_KEY = 'studyHub.v2';
+
+const SUBJECTS_DEFAULT = [
+  { id:'chinese',  name:'中文',      en:'Chinese Language and Literature',      color:'#e5484d', special:false },
+  { id:'english',  name:'英文',      en:'English Language and Literature',      color:'#3b6ef5', special:false },
+  { id:'chuman',   name:'中國人文',  en:'Chinese Humanities',                   color:'#e8a33d', special:false },
+  { id:'sciences', name:'科學',      en:'Sciences',                             color:'#2fb37a', special:false },
+  { id:'pe',       name:'體育',      en:'Physical Health and Education',        color:'#00a2c7', special:false },
+  { id:'indiv',    name:'個體與社會', en:'Individuals and Societies',           color:'#ec4899', special:false },
+  { id:'math',     name:'數學',      en:'Mathematics',                          color:'#8b5cf6', special:false },
+  { id:'geo',      name:'宇宙科學',  en:'GeoScience',                           color:'#f97316', special:true  },
+  { id:'matheng',  name:'數學設計',  en:'Mathematics for Engineering',          color:'#14b8a6', special:false },
+];
+
+const SPECIAL_CRITERIA = ['筆記本 Notebook', '每課小測驗 Quizzes', '單元大考試 Unit Exam', '上課積極度 Participation'];
+const NORMAL_CRITERIA  = ['Criterion A', 'Criterion B', 'Criterion C', 'Criterion D'];
+const LADDER_MAP = { '差':2, '待改進':3, '中':4, '良好':5, '優秀':6, '極好':7, '極佳':7.5 };
+
+function defaultState(){
+  return {
+    updatedAt: Date.now(),
+    settings: {
+      theme: 'light',
+      sync: { provider:'none', supabaseUrl:'', supabaseKey:'', roomId:'',
+              jsonbinId:'', jsonbinKey:'', lastSync:0, auto:true }
+    },
+    subjects: JSON.parse(JSON.stringify(SUBJECTS_DEFAULT)),
+    todos: [], homework: [], exams: [], feedback: [], grades: []
+  };
+}
+
+function normalizeState(raw){
+  const d = defaultState();
+  if (!raw || typeof raw !== 'object') return d;
+  const s = raw;
+  const settings = Object.assign({}, d.settings, s.settings || {});
+  settings.sync = Object.assign({}, d.settings.sync, (s.settings && s.settings.sync) || {});
+  return {
+    updatedAt: s.updatedAt || Date.now(),
+    settings,
+    subjects: (Array.isArray(s.subjects) && s.subjects.length) ? s.subjects : d.subjects,
+    todos: Array.isArray(s.todos) ? s.todos : [],
+    homework: Array.isArray(s.homework) ? s.homework : [],
+    exams: Array.isArray(s.exams) ? s.exams : [],
+    feedback: Array.isArray(s.feedback) ? s.feedback : [],
+    grades: Array.isArray(s.grades) ? s.grades : []
+  };
+}
+
+let state;
+function loadState(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) { state = defaultState(); saveState(); return; }
+    state = normalizeState(JSON.parse(raw));
+  } catch (e) {
+    state = defaultState();
+  }
+}
+function saveState(){
+  state.updatedAt = Date.now();
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  catch (e) { toast('儲存失敗：瀏覽器空間不足', 'error'); }
+}
+
+function subj(id){ return state.subjects.find(s => s.id === id); }
+function subjName(id){ const s = subj(id); return s ? s.name : '未分類'; }
+function subjColor(id){ const s = subj(id); return s ? s.color : '#8a8a95'; }
+function isSpecial(id){ const s = subj(id); return !!(s && s.special); }
+function subjectOptions(sel){
+  return state.subjects.map(s =>
+    `<option value="${s.id}" ${sel === s.id ? 'selected' : ''}>${esc(s.name)} · ${esc(s.en)}</option>`
+  ).join('');
+}
+
+/* ==================================================================
+   2. MYP 換算
+   ================================================================== */
+const MYP_BOUNDS = [[28,7],[24,6],[19,5],[15,4],[10,3],[6,2],[0,1]];
+function toMYP(total){
+  for (const [min, lvl] of MYP_BOUNDS) if (total >= min) return lvl;
+  return 1;
+}
+function parseScore(v){
+  if (v === '' || v === null || v === undefined) return null;
+  if (typeof v === 'number') return isNaN(v) ? null : clamp(v, 0, 8);
+  const s = String(v).trim();
+  if (s === '') return null;
+  const n = parseFloat(s);
+  if (!isNaN(n) && /^[\d.]+$/.test(s)) return clamp(n, 0, 8);
+  if (LADDER_MAP[s] !== undefined) return LADDER_MAP[s];
+  return null;
+}
+function calcRecord(rec){
+  const nums = (rec.scores || []).map(parseScore).filter(v => v !== null);
+  if (!nums.length) return { avg:null, total:null, myp:null, count:0 };
+  const avg = nums.reduce((a,b) => a + b, 0) / nums.length;
+  const total = avg * 4;
+  return { avg, total, myp: toMYP(total), count: nums.length };
+}
+
+/* ==================================================================
+   3. 導航
+   ================================================================== */
+const NAV = [
+  { id:'dashboard', icon:'🏠', label:'主控台',   en:'Dashboard' },
+  { id:'todos',     icon:'📝', label:'待辦',     en:'To-Do' },
+  { id:'homework',  icon:'✍️', label:'作業',     en:'Homework' },
+  { id:'exams',     icon:'📚', label:'考試',     en:'Exams' },
+  { id:'feedback',  icon:'💬', label:'反饋',     en:'Feedback' },
+  { id:'grades',    icon:'💯', label:'成績',     en:'Grades' },
+  { id:'detox',     icon:'🌿', label:'減壓',     en:'Detox' },
+  { id:'guide',     icon:'📋', label:'指南',     en:'Guide' },
+  { id:'settings',  icon:'⚙️', label:'設定',     en:'Settings' },
+];
+
+let currentView = 'dashboard';
+
+function buildNav(){
+  $('#nav').innerHTML = NAV.map(n => `
+    <button class="nav-item" data-view="${n.id}">
+      <span>${n.icon}</span><span>${n.label}</span>
+      <span class="ni-en">${n.en}</span>
+    </button>`).join('');
+  $$('#nav .nav-item').forEach(b => { b.onclick = () => navigate(b.dataset.view); });
+}
+
+function navigate(v){
+  if (currentView === 'detox' && v !== 'detox') AudioEngine.stopAll();
+  currentView = v;
+  $$('.view').forEach(s => s.classList.toggle('active', s.id === 'view-' + v));
+  $$('#nav .nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === v));
+  const item = NAV.find(n => n.id === v);
+  $('#pageTitle').textContent = item.label + ' · ' + item.en;
+  $('#sidebar').classList.remove('open');
+  $('#overlay').classList.remove('show');
+  renderView(v);
+  window.scrollTo({ top:0 });
+}
+
+const RENDERERS = {};
+function renderView(v){ if (RENDERERS[v]) RENDERERS[v](); }
+function rerender(){ renderView(currentView); }
+
+/* ==================================================================
+   4. 主控台（美化版）
+   ================================================================== */
+RENDERERS.dashboard = function(){
+  const el = $('#view-dashboard');
+  const today = todayStr();
+  const ws = startOfWeek();
+  const weekDates = Array.from({ length:7 }, (_, i) => addDays(ws, i));
+
+  const weekTodos = state.todos.filter(t => weekDates.includes(t.date));
+  const doneWeek = weekTodos.filter(t => t.done).length;
+  const pct = weekTodos.length ? Math.round(doneWeek / weekTodos.length * 100) : 0;
+  const C = 2 * Math.PI * 16;
+
+  const pending = state.todos.filter(t => t.date === today && !t.done);
+  const openHW = state.homework.filter(h => h.status !== '已完成' && h.status !== '已繳交')
+    .sort((a, b) => (a.due || '9999').localeCompare(b.due || '9999'));
+  const recentHW = openHW.slice(0, 4);
+  const recentExams = state.exams.filter(e => !e.due || daysUntil(e.due) >= 0)
+    .sort((a, b) => (a.due || '').localeCompare(b.due || '')).slice(0, 4);
+
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? '早安' : hour < 18 ? '午安' : '晚安';
+
+  el.innerHTML = `
+    <div class="dash-hero">
+      <div>
+        <h2>${greet}，今天也加油 👋</h2>
+        <p class="sub">${today.replace(/-/g, '/')} · 今天有 <b>${pending.length}</b> 項待辦、<b>${openHW.length}</b> 項作業、<b>${recentExams.length}</b> 場考試</p>
+        <div class="hero-chips">
+          <span>✅ 本週完成 ${pct}%</span>
+          <span>📝 待辦 ${pending.length}</span>
+          <span>✍️ 作業 ${openHW.length}</span>
+          <span>📚 考試 ${recentExams.length}</span>
+        </div>
+      </div>
+      <div class="ring-wrap">
+        <svg class="ring" viewBox="0 0 42 42">
+          <circle class="bg" cx="21" cy="21" r="16"></circle>
+          <circle class="fg" cx="21" cy="21" r="16"
+            stroke-dasharray="${(pct/100*C).toFixed(1)} ${C.toFixed(1)}"></circle>
+        </svg>
+        <div class="ring-label"><b>${pct}%</b><small>本週</small></div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="card stat">
+        <div class="stat-icon" style="background:rgba(59,110,245,.12)">📝</div>
+        <div><div class="stat-num">${pending.length}</div><div class="stat-label">今日待辦</div></div>
+      </div>
+      <div class="card stat">
+        <div class="stat-icon" style="background:rgba(232,163,61,.15)">✍️</div>
+        <div><div class="stat-num">${openHW.length}</div><div class="stat-label">近日作業</div></div>
+      </div>
+      <div class="card stat">
+        <div class="stat-icon" style="background:rgba(229,72,77,.12)">📚</div>
+        <div><div class="stat-num">${recentExams.length}</div><div class="stat-label">近日考試</div></div>
+      </div>
+      <div class="card stat">
+        <div class="stat-icon" style="background:rgba(34,160,107,.12)">✅</div>
+        <div><div class="stat-num">${doneWeek}/${weekTodos.length}</div><div class="stat-label">本週完成</div></div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="card">
+        <h3 style="display:flex;justify-content:space-between;align-items:center">
+          <span>📝 今日待辦</span>
+          <a data-goto="todos" style="font-size:11px;color:var(--muted);cursor:pointer;font-weight:400">查看 →</a>
+        </h3>
+        ${pending.length ? pending.map(t => `
+          <div class="list-row">
+            <span class="dot" style="background:${subjColor(t.subjectId)}"></span>
+            <span class="grow">${esc(t.text)}</span>
+            <button class="btn sm" data-done="${t.uid}">完成</button>
+          </div>`).join('') : '<div class="empty">今天沒有待辦 ✓</div>'}
+      </div>
+
+      <div class="card">
+        <h3 style="display:flex;justify-content:space-between;align-items:center">
+          <span>✍️ 近日作業</span>
+          <a data-goto="homework" style="font-size:11px;color:var(--muted);cursor:pointer;font-weight:400">查看 →</a>
+        </h3>
+        ${recentHW.length ? recentHW.map(h => {
+          const d = h.due ? daysUntil(h.due) : null;
+          const cls = d === null ? '' : d < 0 ? 'overdue' : d <= 2 ? 'urgent' : '';
+          const txt = d === null ? '' : d < 0 ? `逾期${Math.abs(d)}天` : d === 0 ? '今天' : `${d}天`;
+          return `
+          <div class="list-row">
+            <span class="dot" style="background:${subjColor(h.subjectId)}"></span>
+            <span class="grow">${esc(h.name)}</span>
+            ${txt ? `<span class="due-tag ${cls}">${txt}</span>` : ''}
+          </div>`;
+        }).join('') : '<div class="empty">暫無作業 ✓</div>'}
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3 style="display:flex;justify-content:space-between;align-items:center">
+        <span>📚 近日考試</span>
+        <a data-goto="exams" style="font-size:11px;color:var(--muted);cursor:pointer;font-weight:400">查看 →</a>
+      </h3>
+      ${recentExams.length ? recentExams.map(e => {
+        const d = e.due ? daysUntil(e.due) : null;
+        const cls = d === null ? '' : d <= 3 ? 'urgent' : '';
+        const txt = d === null ? '' : d === 0 ? '今天' : `${d}天`;
+        return `
+        <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:9px;font-size:13px">
+            <span class="dot" style="background:${subjColor(e.subjectId)}"></span>
+            <span class="grow">${esc(e.name)}</span>
+            ${txt ? `<span class="due-tag ${cls}">${txt}</span>` : ''}
+          </div>
+          <div style="margin-top:5px;margin-left:17px;display:flex;align-items:center;gap:8px">
+            <div style="flex:1;background:var(--border);height:4px;border-radius:999px;overflow:hidden">
+              <div style="width:${e.progress || 0}%;height:100%;background:var(--accent);border-radius:999px"></div>
+            </div>
+            <span class="muted" style="font-size:10.5px;min-width:28px;text-align:right">${e.progress || 0}%</span>
+          </div>
+        </div>`;
+      }).join('') : '<div class="empty">暫無考試 ✓</div>'}
+    </div>`;
+
+  el.onclick = e => {
+    const b = e.target.closest('button');
+    if (b && b.dataset.done){
+      const t = state.todos.find(x => x.uid === b.dataset.done);
+      if (t){ t.done = true; saveState(); rerender(); }
+      return;
+    }
+    const g = e.target.closest('[data-goto]');
+    if (g) navigate(g.dataset.goto);
+  };
+};
+
+/* ==================================================================
+   5. 待辦事項
+   ================================================================== */
+RENDERERS.todos = function(){
+  const el = $('#view-todos');
+  const ws = startOfWeek();
+  const dows = ['一','二','三','四','五','六','日'];
+  const days = Array.from({ length:7 }, (_, i) => {
+    const date = addDays(ws, i);
+    return { date, dow: dows[i], d: parseDate(date) };
+  });
+  const today = todayStr();
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>📝 待辦事項 To-Do List</h3>
+      <p class="muted">本週 ${ws} ～ ${addDays(ws, 6)}　·　勾選完成、按 ✕ 刪除</p>
+    </div>
+    <div class="week-grid">
+      ${days.map(day => {
+        const tasks = state.todos.filter(t => t.date === day.date);
+        return `
+        <div class="day-col ${day.date === today ? 'today' : ''}">
+          <div class="day-head">
+            <span>週${day.dow}${day.date === today ? ' · 今天' : ''}</span>
+            <span class="dd">${day.d.getMonth() + 1}/${day.d.getDate()}</span>
+          </div>
+          <div class="day-list">
+            ${tasks.length ? tasks.map(t => `
+              <div class="task ${t.done ? 'done' : ''}">
+                <input type="checkbox" data-tog="${t.uid}" ${t.done ? 'checked' : ''}>
+                <span class="tx">${esc(t.text)}</span>
+                <button class="del" data-del="${t.uid}">✕</button>
+              </div>`).join('') : '<div class="muted" style="font-size:11.5px;padding:4px 0">—</div>'}
+          </div>
+          <div class="day-add">
+            <input type="text" placeholder="新增任務…" data-input="${day.date}">
+            <button data-add="${day.date}">+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  el.onclick = e => {
+    const t = e.target;
+    if (t.dataset.add){
+      const inp = el.querySelector(`input[data-input="${t.dataset.add}"]`);
+      const text = (inp.value || '').trim();
+      if (!text) return;
+      state.todos.push({ uid: uid(), date: t.dataset.add, text, done:false, subjectId:'', createdAt: Date.now() });
+      saveState(); rerender();
+    }
+    if (t.dataset.del){
+      state.todos = state.todos.filter(x => x.uid !== t.dataset.del);
+      saveState(); rerender();
+    }
+  };
+  el.onchange = e => {
+    const t = e.target;
+    if (t.dataset.tog){
+      const item = state.todos.find(x => x.uid === t.dataset.tog);
+      if (item){ item.done = t.checked; saveState(); rerender(); }
+    }
+  };
+  el.onkeydown = e => {
+    if (e.key === 'Enter' && e.target.dataset.input){
+      const date = e.target.dataset.input;
+      const text = e.target.value.trim();
+      if (!text) return;
+      state.todos.push({ uid: uid(), date, text, done:false, subjectId:'', createdAt: Date.now() });
+      saveState(); rerender();
+    }
+  };
+};
+
+/* ==================================================================
+   6. 作業追蹤
+   ================================================================== */
+const HW_STATUS = ['未開始', '進行中', '已完成', '已繳交'];
+const HW_COLOR = { '未開始':'#8a8a95', '進行中':'#3b6ef5', '已完成':'#22a06b', '已繳交':'#8b5cf6' };
+
+RENDERERS.homework = function(){
+  const el = $('#view-homework');
+  const list = [...state.homework].sort((a, b) => (a.due || '').localeCompare(b.due || ''));
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>✍️ 新增作業 New Homework</h3>
+      <div class="row wrap">
+        <input type="text" id="hwName" placeholder="作業名稱 Name…" style="flex:2;min-width:170px">
+        <select id="hwSubject" style="flex:1;min-width:150px">${subjectOptions()}</select>
+        <input type="date" id="hwDue" value="${todayStr()}" style="width:auto">
+        <select id="hwStatus" style="width:auto">${HW_STATUS.map(s => `<option>${s}</option>`).join('')}</select>
+        <button class="btn primary" id="hwAdd">＋ 新增</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 作業清單（${list.length}）</h3>
+      ${list.length ? `
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>作業 Name</th><th>科目 Subject</th><th>到期日 Due</th><th>狀態 Status</th><th></th></tr></thead>
+        <tbody>
+        ${list.map(h => `
+          <tr>
+            <td>${esc(h.name)}</td>
+            <td><span class="dot" style="background:${subjColor(h.subjectId)};margin-right:6px"></span>${esc(subjName(h.subjectId))}</td>
+            <td>${h.due || '—'}${h.due && h.status !== '已完成' && h.status !== '已繳交' ?
+              ` <span class="muted">${daysUntil(h.due) < 0 ? '已逾期' : daysUntil(h.due) + '天'}</span>` : ''}</td>
+            <td>
+              <select class="status-sel" data-hwst="${h.uid}" style="color:${HW_COLOR[h.status] || 'inherit'}">
+                ${HW_STATUS.map(s => `<option ${s === h.status ? 'selected' : ''}>${s}</option>`).join('')}
+              </select>
+            </td>
+            <td style="text-align:right"><button class="icon-btn" data-hwdel="${h.uid}">✕</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>` : '<div class="empty">還沒有作業紀錄</div>'}
+    </div>`;
+
+  el.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'hwAdd'){
+      const name = $('#hwName').value.trim();
+      if (!name){ toast('請輸入作業名稱', 'error'); return; }
+      state.homework.push({
+        uid: uid(), name,
+        subjectId: $('#hwSubject').value,
+        due: $('#hwDue').value,
+        status: $('#hwStatus').value,
+        createdAt: Date.now()
+      });
+      saveState(); rerender(); toast('已新增作業 ✅', 'ok');
+    }
+    if (b.dataset.hwdel){
+      state.homework = state.homework.filter(x => x.uid !== b.dataset.hwdel);
+      saveState(); rerender();
+    }
+  };
+  el.onchange = e => {
+    if (e.target.dataset.hwst){
+      const h = state.homework.find(x => x.uid === e.target.dataset.hwst);
+      if (h){ h.status = e.target.value; saveState(); rerender(); }
+    }
+  };
+};
+
+/* ==================================================================
+   7. 考試計劃
+   ================================================================== */
+RENDERERS.exams = function(){
+  const el = $('#view-exams');
+  const list = [...state.exams].sort((a, b) => (a.due || '').localeCompare(b.due || ''));
+  const today = todayStr();
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>📚 新增考試 New Exam</h3>
+      <div class="row wrap" style="margin-bottom:10px">
+        <input type="text" id="exName" placeholder="考試名稱 Name…" style="flex:2;min-width:170px">
+        <select id="exSubject" style="flex:1;min-width:150px">${subjectOptions()}</select>
+        <input type="date" id="exDue" value="${today}" style="width:auto">
+      </div>
+      <div class="field">
+        <label class="fl">評分準則 Criteria</label>
+        <textarea id="exCriteria" placeholder="例如：Criterion A 分析、Criterion B 組織…" style="min-height:62px"></textarea>
+      </div>
+      <button class="btn primary" id="exAdd">＋ 新增考試</button>
+    </div>
+
+    <div class="card">
+      <h3>🗓️ 考試清單（${list.length}）</h3>
+      ${list.length ? list.map(ex => {
+        const dd = daysUntil(ex.due);
+        const passed = dd < 0;
+        return `
+        <div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:13px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px">
+            <span class="dot" style="background:${subjColor(ex.subjectId)}"></span>
+            <b style="font-size:13.5px">${esc(ex.name)}</b>
+            <span class="tag">${esc(subjName(ex.subjectId))}</span>
+            <span class="muted">${ex.due} · ${passed ? '已結束' : dd + ' 天'}</span>
+            <span class="muted" style="margin-left:auto">${ex.progress || 0}%</span>
+            <button class="icon-btn" data-exdel="${ex.uid}" title="刪除">✕</button>
+          </div>
+          ${ex.criteria ? `<p class="muted" style="margin-bottom:8px;white-space:pre-wrap">${esc(ex.criteria)}</p>` : ''}
+          <input type="range" min="0" max="100" step="5" value="${ex.progress || 0}" data-exprog="${ex.uid}">
+          <div class="s-prog"><i style="width:${ex.progress || 0}%"></i></div>
+        </div>`;
+      }).join('') : '<div class="empty">還沒有考試計劃</div>'}
+    </div>`;
+
+  el.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'exAdd'){
+      const name = $('#exName').value.trim();
+      if (!name){ toast('請輸入考試名稱', 'error'); return; }
+      state.exams.push({
+        uid: uid(), name,
+        subjectId: $('#exSubject').value,
+        due: $('#exDue').value,
+        criteria: $('#exCriteria').value.trim(),
+        progress: 0,
+        createdAt: Date.now()
+      });
+      saveState(); rerender(); toast('已新增考試 ✅', 'ok');
+    }
+    if (b.dataset.exdel){
+      state.exams = state.exams.filter(x => x.uid !== b.dataset.exdel);
+      saveState(); rerender();
+    }
+  };
+  el.oninput = e => {
+    if (e.target.dataset.exprog){
+      const ex = state.exams.find(x => x.uid === e.target.dataset.exprog);
+      if (ex){
+        ex.progress = +e.target.value;
+        const bar = e.target.parentElement.querySelector('.s-prog > i');
+        if (bar) bar.style.width = ex.progress + '%';
+        const lbl = e.target.parentElement.querySelector('span.muted[style*="margin-left:auto"]');
+        if (lbl) lbl.textContent = ex.progress + '%';
+      }
+    }
+  };
+  el.onchange = e => { if (e.target.dataset.exprog) saveState(); };
+};
+
+/* ==================================================================
+   8. 考試反饋
+   ================================================================== */
+RENDERERS.feedback = function(){
+  const el = $('#view-feedback');
+  const fSub = el.dataset.fSubject || 'all';
+  const fGrade = el.dataset.fGrade || 'all';
+
+  const allGrades = [...new Set(state.feedback.map(f => f.grade).filter(Boolean))].sort();
+  let list = [...state.feedback].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  if (fSub !== 'all') list = list.filter(f => f.subjectId === fSub);
+  if (fGrade !== 'all') list = list.filter(f => f.grade === fGrade);
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>💬 新增反饋 New Feedback</h3>
+      <div class="row wrap" style="margin-bottom:10px">
+        <select id="fbSubject" style="flex:1;min-width:150px">${subjectOptions()}</select>
+        <input type="text" id="fbGrade" placeholder="年級（如 MYP 3 / Grade 9）" style="flex:1;min-width:150px">
+        <input type="text" id="fbTeacher" placeholder="老師" style="flex:1;min-width:110px">
+        <input type="date" id="fbDate" value="${todayStr()}" style="width:auto">
+      </div>
+      <div class="field">
+        <label class="fl">評語 Comment</label>
+        <textarea id="fbComment" placeholder="老師給的評語…"></textarea>
+      </div>
+      <button class="btn primary" id="fbAdd">＋ 新增反饋</button>
+    </div>
+
+    <div class="card">
+      <h3>🔍 篩選 Filter</h3>
+      <div class="row wrap">
+        <select id="fSub" style="width:auto;min-width:150px">
+          <option value="all">全部科目</option>
+          ${subjectOptions(fSub)}
+        </select>
+        <select id="fGrade" style="width:auto;min-width:130px">
+          <option value="all">全部年級</option>
+          ${allGrades.map(g => `<option ${g === fGrade ? 'selected' : ''}>${esc(g)}</option>`).join('')}
+        </select>
+        <span class="muted">共 ${list.length} 筆</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📄 反饋紀錄</h3>
+      ${list.length ? list.map(f => `
+        <div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:13px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:8px">
+            <span class="dot" style="background:${subjColor(f.subjectId)}"></span>
+            <b>${esc(subjName(f.subjectId))}</b>
+            ${f.grade ? `<span class="tag">${esc(f.grade)}</span>` : ''}
+            ${f.teacher ? `<span class="muted">👤 ${esc(f.teacher)}</span>` : ''}
+            <span class="muted">${f.date || ''}</span>
+            <button class="icon-btn" data-fbdel="${f.uid}" style="margin-left:auto">✕</button>
+          </div>
+          <p style="white-space:pre-wrap;font-size:13px">${esc(f.comment)}</p>
+        </div>`).join('') : '<div class="empty">沒有符合條件的反饋</div>'}
+    </div>`;
+
+  el.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'fbAdd'){
+      const comment = $('#fbComment').value.trim();
+      if (!comment){ toast('請輸入評語', 'error'); return; }
+      state.feedback.push({
+        uid: uid(),
+        subjectId: $('#fbSubject').value,
+        grade: $('#fbGrade').value.trim(),
+        teacher: $('#fbTeacher').value.trim(),
+        date: $('#fbDate').value,
+        comment,
+        createdAt: Date.now()
+      });
+      saveState(); rerender(); toast('已新增反饋 ✅', 'ok');
+    }
+    if (b.dataset.fbdel){
+      state.feedback = state.feedback.filter(x => x.uid !== b.dataset.fbdel);
+      saveState(); rerender();
+    }
+  };
+  el.onchange = e => {
+    if (e.target.id === 'fSub'){ el.dataset.fSubject = e.target.value; rerender(); }
+    if (e.target.id === 'fGrade'){ el.dataset.fGrade = e.target.value; rerender(); }
+  };
+};
+
+/* ==================================================================
+   9. 成績單
+   ================================================================== */
+let gradeDraft = { subjectId:null, name:'', date:'', scores:['','','',''] };
+
+RENDERERS.grades = function(){
+  const el = $('#view-grades');
+  if (!gradeDraft.subjectId) gradeDraft.subjectId = state.subjects[0] ? state.subjects[0].id : '';
+  if (!gradeDraft.date) gradeDraft.date = todayStr();
+
+  const special = isSpecial(gradeDraft.subjectId);
+  const critNames = special ? SPECIAL_CRITERIA : NORMAL_CRITERIA;
+
+  const records = [...state.grades].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  const bySubject = {};
+  state.grades.forEach(r => {
+    const c = calcRecord(r);
+    if (c.myp === null) return;
+    (bySubject[r.subjectId] = bySubject[r.subjectId] || []).push(c.myp);
+  });
+  const subjectAvg = Object.entries(bySubject).map(([sid, arr]) => ({
+    sid, avg: arr.reduce((a, b) => a + b, 0) / arr.length, n: arr.length
+  }));
+  const overallAvg = subjectAvg.length
+    ? subjectAvg.reduce((a, b) => a + b.avg, 0) / subjectAvg.length
+    : null;
+
+  const previewScores = gradeDraft.scores.map(parseScore);
+  const previewValid = previewScores.filter(v => v !== null);
+  const previewAvg = previewValid.length ? previewValid.reduce((a, b) => a + b, 0) / previewValid.length : null;
+  const previewMYP = previewAvg !== null ? toMYP(previewAvg * 4) : null;
+
+  el.innerHTML = `
+    <div class="card">
+      <h3>💯 新增成績 New Assessment</h3>
+      <div class="row wrap" style="margin-bottom:12px">
+        <select id="grSubject" style="flex:1;min-width:170px">${subjectOptions(gradeDraft.subjectId)}</select>
+        <input type="text" id="grName" placeholder="評估名稱（如：單元三測驗）" value="${esc(gradeDraft.name)}" style="flex:2;min-width:170px">
+        <input type="date" id="grDate" value="${gradeDraft.date}" style="width:auto">
+      </div>
+
+      <label class="fl">${special
+        ? '評分標準（0–8 數字，或「差 / 待改進 / 中 / 良好 / 優秀 / 極好」）'
+        : 'Criterion 分數（0–8）'}</label>
+      <div class="grid2" style="margin-bottom:10px">
+        ${critNames.map((c, i) => `
+          <div>
+            <label class="fl">${esc(c)}</label>
+            <input type="text" inputmode="decimal" data-gs="${i}" value="${esc(gradeDraft.scores[i])}" placeholder="0–8">
+          </div>`).join('')}
+      </div>
+
+      <div class="row wrap" style="margin-bottom:12px">
+        <span class="tag">平均 ${previewAvg !== null ? previewAvg.toFixed(2) : '—'} / 8</span>
+        <span class="tag">總分 ${previewAvg !== null ? (previewAvg * 4).toFixed(1) : '—'} / 32</span>
+        <span class="tag" style="color:var(--accent);border-color:var(--accent)">
+          MYP ${previewMYP !== null ? previewMYP : '—'}
+        </span>
+        ${special ? '<span class="muted">※ 特殊科目四項平均 ×4 換算 32 分制</span>' : ''}
+      </div>
+
+      <button class="btn primary" id="grAdd">＋ 儲存成績</button>
+      <button class="btn" id="grClear">清空</button>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>📊 各科平均</h3>
+        ${subjectAvg.length ? subjectAvg.map(s => `
+          <div class="list-row">
+            <span class="dot" style="background:${subjColor(s.sid)}"></span>
+            <span class="grow">${esc(subjName(s.sid))}</span>
+            <span class="muted">${s.n} 筆</span>
+            <b style="margin-left:8px">MYP ${s.avg.toFixed(1)}</b>
+          </div>`).join('') : '<div class="empty">尚無資料</div>'}
+        ${overallAvg !== null ? `
+          <div class="list-row" style="border-top:1px solid var(--border);margin-top:6px;padding-top:10px">
+            <span class="grow"><b>標準平均分</b></span>
+            <b style="color:var(--accent)">MYP ${overallAvg.toFixed(2)}</b>
+          </div>` : ''}
+      </div>
+
+      <div class="card">
+        <h3>📐 MYP 換算表</h3>
+        <div class="tbl-wrap"><table class="tbl">
+          <thead><tr><th>總分（32）</th><th>MYP</th><th>說明</th></tr></thead>
+          <tbody>
+            <tr><td>28 – 32</td><td><b>7</b></td><td class="muted">優秀 Excellent</td></tr>
+            <tr><td>24 – 27</td><td><b>6</b></td><td class="muted">很好 Very Good</td></tr>
+            <tr><td>19 – 23</td><td><b>5</b></td><td class="muted">良好 Good</td></tr>
+            <tr><td>15 – 18</td><td><b>4</b></td><td class="muted">滿意 Satisfactory</td></tr>
+            <tr><td>10 – 14</td><td><b>3</b></td><td class="muted">基本 Basic</td></tr>
+            <tr><td>6 – 9</td><td><b>2</b></td><td class="muted">待改進 Limited</td></tr>
+            <tr><td>0 – 5</td><td><b>1</b></td><td class="muted">需支援 Very Limited</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📋 成績紀錄（${records.length}）</h3>
+      ${records.length ? `
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>日期</th><th>科目</th><th>評估</th><th>分數</th><th>平均</th><th>MYP</th><th></th></tr></thead>
+        <tbody>
+        ${records.map(r => {
+          const c = calcRecord(r);
+          const crits = isSpecial(r.subjectId) ? SPECIAL_CRITERIA : NORMAL_CRITERIA;
+          const scoresText = (r.scores || []).map((v, i) =>
+            `${(crits[i] || 'C' + (i + 1)).split(' ')[0]} ${v === '' || v === null ? '—' : esc(v)}`
+          ).join('　');
+          return `<tr>
+            <td>${r.date || '—'}</td>
+            <td><span class="dot" style="background:${subjColor(r.subjectId)};margin-right:6px"></span>${esc(subjName(r.subjectId))}</td>
+            <td>${esc(r.name || '—')}</td>
+            <td class="muted" style="max-width:280px">${scoresText}</td>
+            <td>${c.avg !== null ? c.avg.toFixed(2) : '—'}</td>
+            <td><b style="color:var(--accent)">${c.myp !== null ? c.myp : '—'}</b></td>
+            <td style="text-align:right"><button class="icon-btn" data-grdel="${r.uid}">✕</button></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>` : '<div class="empty">還沒有成績紀錄</div>'}
+    </div>`;
+
+  el.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'grAdd'){
+      if (!gradeDraft.scores.some(s => String(s).trim() !== '')){
+        toast('請至少填入一個分數', 'error'); return;
+      }
+      state.grades.push({
+        uid: uid(),
+        subjectId: gradeDraft.subjectId,
+        name: gradeDraft.name.trim(),
+        date: gradeDraft.date || todayStr(),
+        scores: [...gradeDraft.scores],
+        special: isSpecial(gradeDraft.subjectId),
+        createdAt: Date.now()
+      });
+      gradeDraft = { subjectId: gradeDraft.subjectId, name:'', date: todayStr(), scores:['','','',''] };
+      saveState(); rerender(); toast('已儲存成績 ✅', 'ok');
+    }
+    if (b.id === 'grClear'){
+      gradeDraft.name = ''; gradeDraft.scores = ['','','',''];
+      rerender();
+    }
+    if (b.dataset.grdel){
+      state.grades = state.grades.filter(x => x.uid !== b.dataset.grdel);
+      saveState(); rerender();
+    }
+  };
+  el.oninput = e => {
+    const t = e.target;
+    if (t.id === 'grName') gradeDraft.name = t.value;
+    if (t.id === 'grDate') gradeDraft.date = t.value;
+    if (t.dataset.gs !== undefined){
+      gradeDraft.scores[+t.dataset.gs] = t.value;
+      const nums = gradeDraft.scores.map(parseScore).filter(v => v !== null);
+      const avg = nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null;
+      const tags = el.querySelectorAll('.row.wrap .tag');
+      if (tags.length >= 3){
+        tags[0].textContent = `平均 ${avg !== null ? avg.toFixed(2) : '—'} / 8`;
+        tags[1].textContent = `總分 ${avg !== null ? (avg * 4).toFixed(1) : '—'} / 32`;
+        tags[2].textContent = `MYP ${avg !== null ? toMYP(avg * 4) : '—'}`;
+      }
+    }
+  };
+  el.onchange = e => {
+    if (e.target.id === 'grSubject'){
+      gradeDraft.subjectId = e.target.value;
+      gradeDraft.scores = ['','','',''];
+      rerender();
+    }
+  };
+};
+
+/* ==================================================================
+   10. 解壓空間
+   ================================================================== */
+const QUOTES = [
+  { zh:'你已經做得很好了。', en:"You're doing better than you think." },
+  { zh:'休息不是偷懶，是為了走更遠。', en:"Rest isn't laziness; it's fuel for the long road." },
+  { zh:'今天的你，比昨天多懂了一點點。', en:'Today you know a little more than yesterday.' },
+  { zh:'沒有人能一次就學會所有事。', en:'Nobody learns everything at once.' },
+  { zh:'慢慢來，比較快。', en:'Slow is smooth, and smooth is fast.' },
+  { zh:'你的價值不是分數能定義的。', en:"Your worth isn't defined by a grade." },
+  { zh:'深呼吸，一切都還來得及。', en:"Breathe. There's still time." },
+  { zh:'錯了就錯了，改過來就好。', en:'So you made a mistake. Fix it and move on.' },
+  { zh:'你不需要跟任何人比較。', en:"You don't have to compare yourself to anyone." },
+  { zh:'今晚早點睡，明天的你會感謝你。', en:'Sleep early tonight; tomorrow-you will thank you.' },
+  { zh:'不會的題目，是還沒打開的禮物。', en:"A question you can't solve is a gift you haven't opened yet." },
+  { zh:'你已經走了這麼遠，別急著否定自己。', en:"You've come this far — don't write yourself off." },
+  { zh:'偶爾發呆也是充電。', en:'Sometimes staring at nothing is how you recharge.' },
+  { zh:'討厭數學沒關係，先討厭五分鐘再回來。', en:"It's okay to hate math. Hate it for five minutes, then come back." },
+  { zh:'你不需要每天都滿分。', en:"You don't need a perfect day every day." },
+  { zh:'喝水。真的，現在就去。', en:'Drink water. Seriously, go now.' },
+  { zh:'山不會因為你走得慢就消失。', en:"The mountain won't disappear because you walk slowly." },
+  { zh:'今天先完成一件事就好。', en:'Just finish one thing today.' },
+  { zh:'焦慮是因為你在乎，這不是壞事。', en:"Anxiety means you care. That's not a flaw." },
+  { zh:'老師也會忘記事情，你也是人。', en:"Teachers forget things too. You're human." },
+  { zh:'把大任務切成小塊，就沒那麼可怕。', en:'Cut the big task into small ones; it gets less scary.' },
+  { zh:'你現在的掙扎，以後會變成故事。', en:'Your current struggle will be a story later.' },
+  { zh:'允許自己重來一次。', en:'Give yourself permission to start over.' },
+  { zh:'窗外的雲也在慢慢移動，你也可以。', en:'The clouds outside move slowly. So can you.' },
+  { zh:'不會就是不會，先去吃飯。', en:"If you don't get it, you don't get it. Go eat first." },
+  { zh:'你值得被溫柔對待，包括被你自己。', en:'You deserve kindness — including from yourself.' },
+  { zh:'進度條不是直的，它會卡住。', en:"Progress bars aren't straight lines. They stall." },
+  { zh:'記得嗎？去年你也覺得撐不過去。', en:"Remember? Last year you thought you couldn't make it either." },
+  { zh:'專注二十五分鐘，然後放空五分鐘。', en:'Focus for 25 minutes, then zone out for 5.' },
+  { zh:'你不是懶，你只是累了。', en:"You're not lazy. You're tired." },
+  { zh:'每一天都是新的存檔點。', en:'Every day is a new save point.' },
+  { zh:'謝謝你今天還是努力了。', en:'Thank you for trying today.' },
+  { zh:'允許自己討厭某個科目。', en:"It's okay to dislike a subject." },
+  { zh:'你不需要向任何人證明什麼。', en:"You don't have to prove anything to anyone." },
+  { zh:'考不好不代表你不好。', en:"A bad grade doesn't mean you're a bad person." },
+  { zh:'把窗戶打開，換一口氣。', en:'Open a window. Take a different breath.' }
+];
+
+const AudioEngine = {
+  ctx:null, master:null, noiseBuf:null, brownBuf:null,
+  tracks:{}, volumes:{ rain:0.5, waves:0.5, fire:0.45, cafe:0.4, forest:0.4, chime:0.35 },
+  builders:{},
+
+  init(){
+    if (this.ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) { toast('此瀏覽器不支援 Web Audio', 'error'); return; }
+    this.ctx = new AC();
+    this.master = this.ctx.createGain();
+    this.master.gain.value = 0.85;
+    this.master.connect(this.ctx.destination);
+    this.noiseBuf = this.makeNoise(3, 'white');
+    this.brownBuf = this.makeNoise(3, 'brown');
+    this._register();
+  },
+  resume(){ if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); },
+  makeNoise(sec, type){
+    const len = Math.floor(this.ctx.sampleRate * sec);
+    const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < len; i++){
+      const w = Math.random() * 2 - 1;
+      if (type === 'brown'){ last = (last + 0.02 * w) / 1.02; d[i] = last * 3.2; }
+      else d[i] = w;
+    }
+    return buf;
+  },
+  _loopNoise(buf){
+    const s = this.ctx.createBufferSource();
+    s.buffer = buf; s.loop = true;
+    return s;
+  },
+  _register(){
+    const self = this;
+
+    this.builders.rain = function(){
+      const ctx = self.ctx;
+      const src = self._loopNoise(self.noiseBuf);
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 260;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200;
+      const out = ctx.createGain(); out.gain.value = 0.9;
+      src.connect(hp); hp.connect(lp); lp.connect(out);
+      src.start();
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.3;
+      const lg = ctx.createGain(); lg.gain.value = 0.12;
+      lfo.connect(lg); lg.connect(out.gain); lfo.start();
+      return { out, stop(){ try{ src.stop(); lfo.stop(); }catch(e){} } };
+    };
+
+    this.builders.waves = function(){
+      const ctx = self.ctx;
+      const src = self._loopNoise(self.noiseBuf);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 620; bp.Q.value = 0.7;
+      const out = ctx.createGain(); out.gain.value = 0.3;
+      const lfo = ctx.createOscillator(); lfo.frequency.value = 0.085;
+      const lg = ctx.createGain(); lg.gain.value = 0.3;
+      lfo.connect(lg); lg.connect(out.gain); lfo.start();
+      src.connect(bp); bp.connect(out);
+      src.start();
+      return { out, stop(){ try{ src.stop(); lfo.stop(); }catch(e){} } };
+    };
+
+    this.builders.fire = function(){
+      const ctx = self.ctx;
+      const src = self._loopNoise(self.brownBuf);
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 760;
+      const out = ctx.createGain(); out.gain.value = 0.85;
+      src.connect(lp); lp.connect(out);
+      src.start();
+      const timer = setInterval(() => { if (Math.random() < 0.7) self._crackle(out); }, 170);
+      return { out, stop(){ clearInterval(timer); try{ src.stop(); }catch(e){} } };
+    };
+
+    this.builders.cafe = function(){
+      const ctx = self.ctx;
+      const src = self._loopNoise(self.brownBuf);
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
+      const out = ctx.createGain(); out.gain.value = 0.9;
+      src.connect(lp); lp.connect(out);
+      src.start();
+      const timer = setInterval(() => {
+        const r = Math.random();
+        if (r < 0.28) self._clink(out);
+        else if (r < 0.42) self._murmur(out);
+      }, 900);
+      return { out, stop(){ clearInterval(timer); try{ src.stop(); }catch(e){} } };
+    };
+
+    this.builders.forest = function(){
+      const ctx = self.ctx;
+      const src = self._loopNoise(self.noiseBuf);
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1700;
+      const out = ctx.createGain(); out.gain.value = 0.5;
+      src.connect(lp); lp.connect(out);
+      src.start();
+      const timer = setInterval(() => { if (Math.random() < 0.5) self._chirp(out); }, 1200);
+      return { out, stop(){ clearInterval(timer); try{ src.stop(); }catch(e){} } };
+    };
+
+    this.builders.chime = function(){
+      const ctx = self.ctx;
+      const out = ctx.createGain(); out.gain.value = 0.9;
+      const timer = setInterval(() => { if (Math.random() < 0.55) self._chimeSound(out); }, 1400);
+      return { out, stop(){ clearInterval(timer); } };
+    };
+  },
+
+  _crackle(out){
+    const ctx = this.ctx, t = ctx.currentTime;
+    const src = ctx.createBufferSource(); src.buffer = this.noiseBuf;
+    src.playbackRate.value = 1 + Math.random();
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass';
+    bp.frequency.value = 1100 + Math.random() * 2600; bp.Q.value = 6;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.08 + Math.random() * 0.22, t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + 0.07);
+    src.connect(bp); bp.connect(g); g.connect(out);
+    src.start(t); src.stop(t + 0.1);
+  },
+  _clink(out){
+    const ctx = this.ctx, t = ctx.currentTime;
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.value = 1600 + Math.random() * 1800;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.05, t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0005, t + 0.28);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + 0.3);
+  },
+  _murmur(out){
+    const ctx = this.ctx, t = ctx.currentTime;
+    const src = ctx.createBufferSource(); src.buffer = this.brownBuf; src.loop = true;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 320; bp.Q.value = 2.5;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.14, t + 0.35);
+    g.gain.linearRampToValueAtTime(0, t + 1.5);
+    src.connect(bp); bp.connect(g); g.connect(out);
+    src.start(t); src.stop(t + 1.6);
+  },
+  _chirp(out){
+    const ctx = this.ctx, t = ctx.currentTime;
+    const o = ctx.createOscillator(); o.type = 'sine';
+    const f0 = 1800 + Math.random() * 1300;
+    o.frequency.setValueAtTime(f0, t);
+    o.frequency.exponentialRampToValueAtTime(f0 * 1.65, t + 0.06);
+    o.frequency.exponentialRampToValueAtTime(f0 * 0.9, t + 0.15);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.09, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0004, t + 0.18);
+    o.connect(g); g.connect(out);
+    o.start(t); o.stop(t + 0.2);
+  },
+  _chimeSound(out){
+    const ctx = this.ctx, t = ctx.currentTime;
+    const PENTA = [523.25, 587.33, 698.46, 783.99, 880.0, 1046.5, 1174.66];
+    const f = PENTA[Math.floor(Math.random() * PENTA.length)];
+    const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = f;
+    const o2 = ctx.createOscillator(); o2.type = 'sine'; o2.frequency.value = f * 2.01;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.11, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0004, t + 2.4);
+    const g2 = ctx.createGain(); g2.gain.value = 0.25;
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(out);
+    o.start(t); o2.start(t); o.stop(t + 2.5); o2.stop(t + 2.5);
+  },
+
+  start(id){
+    this.init();
+    if (!this.ctx) return;
+    this.resume();
+    if (this.tracks[id]) return;
+    const builder = this.builders[id];
+    if (!builder) return;
+    const t = builder();
+    const vol = this.ctx.createGain();
+    vol.gain.value = this.volumes[id] ?? 0.5;
+    t.out.connect(vol);
+    vol.connect(this.master);
+    this.tracks[id] = { ...t, vol };
+  },
+  stop(id){
+    const t = this.tracks[id];
+    if (!t) return;
+    try { t.stop(); } catch(e){}
+    try { t.vol.disconnect(); } catch(e){}
+    delete this.tracks[id];
+  },
+  stopAll(){ Object.keys(this.tracks).forEach(id => this.stop(id)); },
+  setVolume(id, v){
+    this.volumes[id] = v;
+    if (this.tracks[id]) this.tracks[id].vol.gain.value = v;
+  },
+  playPop(){
+    this.init();
+    if (!this.ctx) return;
+    this.resume();
+    const ctx = this.ctx, t = ctx.currentTime;
+    const o = ctx.createOscillator(); o.type = 'sine';
+    o.frequency.setValueAtTime(680 + Math.random() * 420, t);
+    o.frequency.exponentialRampToValueAtTime(170, t + 0.09);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.22, t);
+    g.gain.exponentialRampToValueAtTime(0.0005, t + 0.13);
+    o.connect(g); g.connect(this.master);
+    o.start(t); o.stop(t + 0.15);
+  }
+};
+
+let bubbleCanvas = null, bubbleCtx = null, bubbleList = [], bubbleRAF = null, bubbleSparks = [];
+
+function startBubbleLoop(){
+  if (bubbleRAF) return;
+  bubbleRAF = requestAnimationFrame(bubbleLoop);
+}
+function bubbleLoop(){
+  if (currentView !== 'detox' || !bubbleCanvas || !bubbleCanvas.isConnected){
+    bubbleRAF = null; bubbleList = []; bubbleSparks = [];
+    return;
+  }
+  const cvs = bubbleCanvas, ctx = bubbleCtx;
+  const w = cvs.clientWidth, h = cvs.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  if (cvs.width !== Math.round(w * dpr) || cvs.height !== Math.round(h * dpr)){
+    cvs.width = Math.round(w * dpr);
+    cvs.height = Math.round(h * dpr);
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  if (Math.random() < 0.045 && bubbleList.length < 26){
+    bubbleList.push({
+      x: 30 + Math.random() * (w - 60),
+      y: h + 30,
+      r: 11 + Math.random() * 24,
+      vy: 0.35 + Math.random() * 0.95,
+      wob: Math.random() * Math.PI * 2,
+      ws: 0.008 + Math.random() * 0.02,
+      hue: 275 + Math.random() * 65,
+      cx: 0
+    });
+  }
+
+  for (let i = bubbleList.length - 1; i >= 0; i--){
+    const b = bubbleList[i];
+    b.y -= b.vy;
+    b.wob += b.ws;
+    b.cx = b.x + Math.sin(b.wob) * 9;
+    if (b.y + b.r < -20){ bubbleList.splice(i, 1); continue; }
+    const g = ctx.createRadialGradient(b.cx - b.r * 0.32, b.y - b.r * 0.32, b.r * 0.08, b.cx, b.y, b.r);
+    g.addColorStop(0, `hsla(${b.hue},100%,92%,0.55)`);
+    g.addColorStop(0.55, `hsla(${b.hue},80%,70%,0.10)`);
+    g.addColorStop(1, `hsla(${b.hue},90%,68%,0.34)`);
+    ctx.beginPath();
+    ctx.arc(b.cx, b.y, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.strokeStyle = `hsla(${b.hue},95%,85%,0.42)`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  for (let i = bubbleSparks.length - 1; i >= 0; i--){
+    const p = bubbleSparks[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.life -= 1;
+    if (p.life <= 0){ bubbleSparks.splice(i, 1); continue; }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * (p.life / p.max), 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${p.hue},95%,80%,${p.life / p.max})`;
+    ctx.fill();
+  }
+
+  bubbleRAF = requestAnimationFrame(bubbleLoop);
+}
+
+function burnParticles(mode, rect){
+  const cvs = document.getElementById('burnCanvas');
+  cvs.hidden = false;
+  const dpr = window.devicePixelRatio || 1;
+  const W = window.innerWidth, H = window.innerHeight;
+  cvs.width = Math.round(W * dpr);
+  cvs.height = Math.round(H * dpr);
+  const ctx = cvs.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const cfg = {
+    burn:  { colors:['#ff9a3c','#ff5e3a','#ffd166','#ffb703'], vy:[-2.6,-0.9], vx:[-1.1,1.1], g:-0.006, life:[60,110], size:[1.4,3.6] },
+    wash:  { colors:['#4fc3f7','#29b6f6','#81d4fa','#0288d1'], vy:[0.4,1.6],  vx:[-0.8,0.8], g:0.02,   life:[70,130], size:[1.6,4.0] },
+    blow:  { colors:['#e8e8f0','#c8c8dc','#b9b9cf'],           vy:[-1.0,0.6], vx:[1.2,3.4],  g:0.004,  life:[55,110], size:[1.2,3.0] }
+  }[mode];
+
+  const parts = [];
+  for (let i = 0; i < 240; i++){
+    parts.push({
+      x: rect.left + Math.random() * rect.width,
+      y: rect.top + Math.random() * rect.height,
+      vx: cfg.vx[0] + Math.random() * (cfg.vx[1] - cfg.vx[0]),
+      vy: cfg.vy[0] + Math.random() * (cfg.vy[1] - cfg.vy[0]),
+      g: cfg.g,
+      color: cfg.colors[Math.floor(Math.random() * cfg.colors.length)],
+      max: cfg.life[0] + Math.random() * (cfg.life[1] - cfg.life[0]),
+      life: 0,
+      r: cfg.size[0] + Math.random() * (cfg.size[1] - cfg.size[0])
+    });
+  }
+
+  function frame(){
+    ctx.clearRect(0, 0, W, H);
+    let alive = 0;
+    for (const p of parts){
+      p.life++;
+      if (p.life > p.max) continue;
+      alive++;
+      p.vy += p.g;
+      p.vx *= 0.995;
+      p.x += p.vx;
+      p.y += p.vy;
+      const t = 1 - p.life / p.max;
+      ctx.globalAlpha = t;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * (0.4 + t * 0.9), 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      if (mode === 'burn' && Math.random() < 0.25){
+        ctx.beginPath();
+        ctx.arc(p.x + (Math.random() - 0.5) * 6, p.y + (Math.random() - 0.5) * 6, p.r * 0.6, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,120,40,.5)';
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+    if (alive > 0) requestAnimationFrame(frame);
+    else { cvs.hidden = true; ctx.clearRect(0, 0, W, H); }
+  }
+  requestAnimationFrame(frame);
+}
+
+RENDERERS.detox = function(){
+  const el = $('#view-detox');
+  const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+
+  const tracks = [
+    { id:'rain',   name:'🌧 雨聲' },
+    { id:'waves',  name:'🌊 海浪' },
+    { id:'fire',   name:'🔥 營火' },
+    { id:'cafe',   name:'☕ 咖啡店' },
+    { id:'forest', name:'🌲 森林' },
+    { id:'chime',  name:'🎐 風鈴' }
+  ];
+
+  el.innerHTML = `
+  <div class="detox-wrap">
+    <div class="detox-hero">
+      <h2>解壓空間<span>Detox</span></h2>
+      <p>這裡不會儲存任何東西。寫下的、燒掉的、戳破的，都只留在這一刻。</p>
+    </div>
+
+    <div class="dx-grid">
+      <div class="dx-card">
+        <h3>🎲 隨機一句話</h3>
+        <div class="quote-box" id="quoteBox">
+          <div class="quote-zh" id="quoteZh">「${esc(q.zh)}」</div>
+          <div class="quote-en" id="quoteEn">${esc(q.en)}</div>
+        </div>
+        <button class="dx-btn" id="quoteBtn" style="margin-top:12px">🎲 換一句</button>
+      </div>
+
+      <div class="dx-card">
+        <h3>📝 寫下來，然後燒掉</h3>
+        <textarea id="burnInput" placeholder="把煩惱寫在這裡…寫完之後，讓它離開。" style="min-height:110px"></textarea>
+        <div class="row wrap" style="margin-top:10px">
+          <button class="dx-btn" data-mode="burn">🔥 燒掉</button>
+          <button class="dx-btn" data-mode="wash">🌊 沖走</button>
+          <button class="dx-btn" data-mode="blow">💨 吹散</button>
+        </div>
+        <p class="muted" style="margin-top:9px;color:var(--dx-muted);font-size:11.5px">
+          ※ 內容不會被儲存、不會上傳。
+        </p>
+      </div>
+
+      <div class="dx-card">
+        <h3>🎵 環境音</h3>
+        ${tracks.map(t => `
+          <div class="audio-row">
+            <span class="an">${t.name}</span>
+            <button class="audio-toggle" data-audio="${t.id}" aria-label="${t.id}"></button>
+            <input type="range" min="0" max="1" step="0.01" value="${AudioEngine.volumes[t.id] ?? 0.5}" data-vol="${t.id}">
+          </div>`).join('')}
+        <p class="muted" style="margin-top:10px;color:var(--dx-muted);font-size:11.5px">
+          即時合成，不使用任何音檔。
+        </p>
+      </div>
+
+      <div class="dx-card">
+        <h3>🫧 戳泡泡</h3>
+        <canvas id="bubbleCanvas"></canvas>
+        <p class="muted" style="margin-top:9px;color:var(--dx-muted);font-size:11.5px">
+          點擊泡泡，把它戳破。啵。
+        </p>
+      </div>
+    </div>
+  </div>`;
+
+  let lastIdx = QUOTES.indexOf(q);
+  el.querySelector('#quoteBtn').onclick = () => {
+    let i = lastIdx;
+    while (i === lastIdx && QUOTES.length > 1) i = Math.floor(Math.random() * QUOTES.length);
+    lastIdx = i;
+    const box = el.querySelector('#quoteBox');
+    box.style.opacity = '0';
+    setTimeout(() => {
+      el.querySelector('#quoteZh').textContent = '「' + QUOTES[i].zh + '」';
+      el.querySelector('#quoteEn').textContent = QUOTES[i].en;
+      box.style.transition = 'opacity .25s';
+      box.style.opacity = '1';
+    }, 120);
+  };
+
+  el.querySelectorAll('[data-mode]').forEach(btn => {
+    btn.onclick = () => {
+      const ta = el.querySelector('#burnInput');
+      const text = ta.value.trim();
+      if (!text){ toast('先寫點什麼吧 ✍️', 'error'); return; }
+      const rect = ta.getBoundingClientRect();
+      ta.value = '';
+      burnParticles(btn.dataset.mode, rect);
+      const words = { burn:'燒掉了。', wash:'沖走了。', blow:'吹散了。' };
+      toast(words[btn.dataset.mode], 'ok');
+    };
+  });
+
+  el.querySelectorAll('[data-audio]').forEach(btn => {
+    const id = btn.dataset.audio;
+    if (AudioEngine.tracks[id]) btn.classList.add('on');
+    btn.onclick = () => {
+      if (AudioEngine.tracks[id]){
+        AudioEngine.stop(id);
+        btn.classList.remove('on');
+      } else {
+        AudioEngine.start(id);
+        if (AudioEngine.tracks[id]) btn.classList.add('on');
+        else toast('無法啟動音訊', 'error');
+      }
+    };
+  });
+  el.querySelectorAll('[data-vol]').forEach(r => {
+    r.oninput = () => AudioEngine.setVolume(r.dataset.vol, parseFloat(r.value));
+  });
+
+  bubbleCanvas = el.querySelector('#bubbleCanvas');
+  bubbleCtx = bubbleCanvas.getContext('2d');
+  bubbleList = [];
+  bubbleSparks = [];
+  startBubbleLoop();
+
+  bubbleCanvas.onclick = e => {
+    const rect = bubbleCanvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    for (let i = bubbleList.length - 1; i >= 0; i--){
+      const b = bubbleList[i];
+      const dx = mx - b.cx, dy = my - b.y;
+      if (dx * dx + dy * dy < b.r * b.r){
+        for (let k = 0; k < 12; k++){
+          const a = Math.random() * Math.PI * 2;
+          const sp = 1 + Math.random() * 3;
+          bubbleSparks.push({
+            x: b.cx, y: b.y,
+            vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 1,
+            r: 1.5 + Math.random() * 3,
+            max: 22 + Math.random() * 14, life: 22 + Math.random() * 14,
+            hue: b.hue
+          });
+        }
+        bubbleList.splice(i, 1);
+        AudioEngine.playPop();
+        break;
+      }
+    }
+  };
+};
+
+/* ==================================================================
+   11. 操作指南
+   ================================================================== */
+RENDERERS.guide = function(){
+  const el = $('#view-guide');
+  el.innerHTML = `
+    <div class="card">
+      <h3>📋 操作指南 User Guide</h3>
+      <p class="muted">完全在瀏覽器端運作。資料預設存在這台裝置的 localStorage，重新整理不會不見。跨裝置同步請到「設定」頁填寫雲端資訊。</p>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>🏠 主控台</h3>
+        <p style="font-size:13px;line-height:1.8">
+          · 今日待辦（可直接勾完成）<br>
+          · 近日作業（逾期紅色 / 即將到期橘色）<br>
+          · 近日考試（含準備進度條）<br>
+          · 本週完成度環形圖<br>
+          · 點擊卡片右上角「查看」可跳到對應頁面
+        </p>
+      </div>
+      <div class="card">
+        <h3>📝 待辦</h3>
+        <p style="font-size:13px;line-height:1.8">
+          一週 7 天並排。每天輸入框打上任務，按 Enter 或 + 新增。<br>
+          勾選＝完成，✕ ＝刪除。
+        </p>
+      </div>
+      <div class="card">
+        <h3>✍️ 作業</h3>
+        <p style="font-size:13px;line-height:1.8">
+          記錄名稱、科目、到期日與狀態（未開始 / 進行中 / 已完成 / 已繳交）。<br>
+          未完成的會自動出現在主控台「近日作業」。
+        </p>
+      </div>
+      <div class="card">
+        <h3>📚 考試</h3>
+        <p style="font-size:13px;line-height:1.8">
+          記錄名稱、科目、評分準則與到期日。<br>
+          用滑桿追蹤準備進度（0–100%）。<br>
+          未過期的會自動出現在主控台「近日考試」。
+        </p>
+      </div>
+      <div class="card">
+        <h3>💬 反饋</h3>
+        <p style="font-size:13px;line-height:1.8">
+          把老師的評語記錄下來。<br>
+          可用科目與年級篩選。
+        </p>
+      </div>
+      <div class="card">
+        <h3>💯 成績</h3>
+        <p style="font-size:13px;line-height:1.8">
+          一般科目 4 個 Criterion（A–D），每項 0–8 分，滿分 32。<br>
+          <b>宇宙科學 GeoScience</b> 為特殊科目，四項標準（筆記本 / 小測驗 / 大考試 / 積極度）可填 0–8 或階梯（差 / 良好 / 極好）。<br>
+          系統把特殊科目平均 ×4 換算成 32 分制，再統一換算成 MYP 1–7。<br>
+          「標準平均分」= 各科 MYP 等級的平均。
+        </p>
+      </div>
+      <div class="card">
+        <h3>🌿 減壓</h3>
+        <p style="font-size:13px;line-height:1.8">
+          隨機語錄、寫下來燒掉、6 種即時合成環境音、戳泡泡。<br>
+          <b>寫下的內容完全不會被儲存。</b>
+        </p>
+      </div>
+      <div class="card">
+        <h3>⚙️ 設定與雲端同步</h3>
+        <p style="font-size:13px;line-height:1.8">
+          · 主題切換（深色 / 淺色）<br>
+          · 雲端同步（Supabase / JSONBin.io）<br>
+          · 科目管理（新增、改名、換色、特殊科目標記）<br>
+          · 匯出 / 匯入 JSON、重設所有資料
+        </p>
+      </div>
+      <div class="card">
+        <h3>☁️ 跨裝置同步怎麼設定？</h3>
+        <p style="font-size:13px;line-height:1.8">
+          <b>Supabase（推薦）</b><br>
+          1. 建立免費專案<br>
+          2. 在 SQL Editor 執行：<br>
+          <code style="display:block;background:var(--hover);padding:8px;border-radius:8px;margin:6px 0;font-size:11.5px;overflow-x:auto;white-space:pre">create table study_sync (
+  room_id text primary key,
+  data jsonb,
+  updated_at bigint
+);
+alter table study_sync enable row level security;
+create policy "all" on study_sync for all using (true) with check (true);</code>
+          3. 把 Project URL、anon key、自訂房間 ID 填入設定頁<br><br>
+          <b>JSONBin.io</b><br>
+          1. 註冊後建立一個 Bin（內容 <code>{}</code>）<br>
+          2. 把 Bin ID 與 Master Key 填入設定頁<br><br>
+          同步策略：以最後修改時間為準。每 60 秒、切回視窗、網路恢復時自動同步。<br>
+          在另一台裝置填入<b>相同的房間 ID 與後端金鑰</b>，即可雙向同步。
+        </p>
+      </div>
+    </div>`;
+};
+
+/* ==================================================================
+   12. 設定
+   ================================================================== */
+RENDERERS.settings = function(){
+  const el = $('#view-settings');
+  const s = state.settings.sync;
+
+  el.innerHTML = `
+    <div class="grid2">
+      <div class="card">
+        <h3>🎨 外觀</h3>
+        <button class="btn" id="themeToggle2">
+          ${state.settings.theme === 'dark' ? '☀️ 切換淺色' : '🌙 切換深色'}
+        </button>
+        <p class="muted" style="margin-top:10px">主題會自動記住。</p>
+      </div>
+
+      <div class="card">
+        <h3>💾 資料</h3>
+        <div class="row wrap">
+          <button class="btn" id="exportBtn">⬇️ 匯出 JSON</button>
+          <button class="btn" id="importBtn">⬆️ 匯入 JSON</button>
+          <button class="btn danger" id="resetBtn">🗑️ 重設</button>
+        </div>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
+        <p class="muted" style="margin-top:10px">最後更新：${new Date(state.updatedAt).toLocaleString('zh-TW')}</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>☁️ 雲端同步（跨裝置）</h3>
+      <div class="row wrap" style="margin-bottom:12px">
+        <label class="fl" style="margin:0 4px 0 0">後端</label>
+        <select id="syncProvider" style="width:auto;min-width:180px">
+          <option value="none"     ${s.provider === 'none' ? 'selected' : ''}>僅本地 None</option>
+          <option value="supabase" ${s.provider === 'supabase' ? 'selected' : ''}>Supabase（推薦）</option>
+          <option value="jsonbin"  ${s.provider === 'jsonbin' ? 'selected' : ''}>JSONBin.io</option>
+        </select>
+        <label class="row muted" style="gap:6px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="syncAuto" ${s.auto !== false ? 'checked' : ''} style="width:14px;height:14px;accent-color:var(--accent)">
+          自動同步（60 秒）
+        </label>
+      </div>
+
+      ${s.provider === 'supabase' ? `
+      <div class="grid2">
+        <div class="field">
+          <label class="fl">Project URL</label>
+          <input type="text" data-sync="supabaseUrl" value="${esc(s.supabaseUrl)}" placeholder="https://xxxx.supabase.co">
+        </div>
+        <div class="field">
+          <label class="fl">anon public key</label>
+          <input type="text" data-sync="supabaseKey" value="${esc(s.supabaseKey)}" placeholder="eyJhbGciOi...">
+        </div>
+        <div class="field">
+          <label class="fl">房間 ID Room ID</label>
+          <input type="text" data-sync="roomId" value="${esc(s.roomId)}" placeholder="my-study-room">
+        </div>
+      </div>` : ''}
+
+      ${s.provider === 'jsonbin' ? `
+      <div class="grid2">
+        <div class="field">
+          <label class="fl">Bin ID</label>
+          <input type="text" data-sync="jsonbinId" value="${esc(s.jsonbinId)}" placeholder="65f1a2b3...">
+        </div>
+        <div class="field">
+          <label class="fl">X-Master-Key</label>
+          <input type="text" data-sync="jsonbinKey" value="${esc(s.jsonbinKey)}" placeholder="$2a$10$...">
+        </div>
+      </div>` : ''}
+
+      ${s.provider !== 'none' ? `
+      <div class="row wrap" style="margin-top:6px">
+        <button class="btn primary" id="syncNow">🔄 立即同步</button>
+        <button class="btn" id="syncUp">⬆️ 上傳本地</button>
+        <button class="btn" id="syncDown">⬇️ 下載雲端</button>
+        <span class="muted" style="margin-left:auto">
+          ${s.lastSync ? '上次同步：' + new Date(s.lastSync).toLocaleTimeString('zh-TW') : '尚未同步'}
+        </span>
+      </div>` : '<p class="muted">選擇後端後即可填入連線資訊。兩台裝置填相同房間 ID 即可同步。</p>'}
+    </div>
+
+    <div class="card">
+      <h3>📚 科目管理</h3>
+      <div class="tbl-wrap"><table class="tbl">
+        <thead><tr><th>名稱</th><th>English</th><th>顏色</th><th>特殊</th><th></th></tr></thead>
+        <tbody>
+          ${state.subjects.map(sub => `
+            <tr>
+              <td><input type="text" value="${esc(sub.name)}" data-subname="${sub.id}" style="min-width:90px"></td>
+              <td><input type="text" value="${esc(sub.en)}" data-suben="${sub.id}" style="min-width:190px"></td>
+              <td><input type="color" value="${sub.color}" data-subcolor="${sub.id}" style="width:44px;height:30px;padding:2px;cursor:pointer"></td>
+              <td><input type="checkbox" ${sub.special ? 'checked' : ''} data-subspecial="${sub.id}" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer"></td>
+              <td style="text-align:right"><button class="icon-btn" data-subdel="${sub.id}">✕</button></td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>
+      <div class="row wrap" style="margin-top:12px">
+        <input type="text" id="newSubName" placeholder="新科目名稱" style="flex:1;min-width:140px">
+        <input type="text" id="newSubEn" placeholder="English name" style="flex:2;min-width:170px">
+        <input type="color" id="newSubColor" value="#3b6ef5" style="width:48px;height:36px;padding:2px;cursor:pointer">
+        <button class="btn primary" id="addSubject">＋ 新增</button>
+      </div>
+      <p class="muted" style="margin-top:9px">勾選「特殊」後，成績單會改用四項自訂標準（筆記本 / 小測驗 / 大考試 / 積極度），並自動換算 32 分制。</p>
+    </div>
+
+    <div class="card">
+      <h3>ℹ️ 關於</h3>
+      <p class="muted">
+        個人學習概括 Study Hub · 單一 HTML 檔案應用<br>
+        資料存於 localStorage（key: <code>${LS_KEY}</code>）。
+      </p>
+    </div>`;
+
+  el.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'themeToggle2'){ toggleTheme(); }
+    if (b.id === 'exportBtn'){
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `study-hub-${todayStr()}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast('已匯出 JSON ⬇️', 'ok');
+    }
+    if (b.id === 'importBtn'){ el.querySelector('#importFile').click(); }
+    if (b.id === 'resetBtn'){
+      if (confirm('確定要重設所有資料嗎？此動作無法復原！')) {
+        if (confirm('再次確認：真的要清除全部資料嗎？')) {
+          localStorage.removeItem(LS_KEY);
+          state = defaultState();
+          saveState(); applyTheme(); rerender();
+          toast('已重設所有資料', 'ok');
+        }
+      }
+    }
+    if (b.id === 'addSubject'){
+      const name = el.querySelector('#newSubName').value.trim();
+      const en = el.querySelector('#newSubEn').value.trim();
+      const color = el.querySelector('#newSubColor').value;
+      if (!name){ toast('請輸入科目名稱', 'error'); return; }
+      state.subjects.push({ id: uid(), name, en: en || name, color, special:false });
+      saveState(); rerender(); toast('已新增科目 ✅', 'ok');
+    }
+    if (b.dataset.subdel){
+      if (confirm('刪除此科目？既有紀錄會顯示為「未分類」。')){
+        state.subjects = state.subjects.filter(x => x.id !== b.dataset.subdel);
+        saveState(); rerender();
+      }
+    }
+    if (b.id === 'syncNow'){ doSync('auto', true); }
+    if (b.id === 'syncUp'){ doSync('upload'); }
+    if (b.id === 'syncDown'){ doSync('download'); }
+  };
+
+  el.onchange = e => {
+    const t = e.target;
+    if (t.id === 'syncProvider'){ state.settings.sync.provider = t.value; saveState(); rerender(); }
+    if (t.id === 'syncAuto'){ state.settings.sync.auto = t.checked; saveState(); }
+    if (t.id === 'importFile'){
+      const f = t.files[0]; if (!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          state = normalizeState(data);
+          saveState(); applyTheme(); rerender();
+          toast('匯入成功 ✅', 'ok');
+        } catch(err){ toast('匯入失敗：檔案格式錯誤', 'error'); }
+      };
+      reader.readAsText(f);
+    }
+    if (t.dataset.subname){
+      const s2 = state.subjects.find(x => x.id === t.dataset.subname);
+      if (s2){ s2.name = t.value; saveState(); }
+    }
+    if (t.dataset.suben){
+      const s2 = state.subjects.find(x => x.id === t.dataset.suben);
+      if (s2){ s2.en = t.value; saveState(); }
+    }
+    if (t.dataset.subcolor){
+      const s2 = state.subjects.find(x => x.id === t.dataset.subcolor);
+      if (s2){ s2.color = t.value; saveState(); }
+    }
+    if (t.dataset.subspecial){
+      const s2 = state.subjects.find(x => x.id === t.dataset.subspecial);
+      if (s2){ s2.special = t.checked; saveState(); }
+    }
+  };
+
+  el.oninput = e => {
+    const t = e.target;
+    if (t.dataset.sync){
+      state.settings.sync[t.dataset.sync] = t.value;
+      saveState(); updateSyncPill();
+    }
+  };
+};
+
+/* ==================================================================
+   13. 雲端同步
+   ================================================================== */
+function updateSyncPill(status){
+  const p = $('#syncPill');
+  const s = state.settings.sync;
+  p.className = 'pill';
+  if (status === 'syncing'){ p.textContent = '🔄 同步中…'; return; }
+  if (status === 'ok'){ p.textContent = '● 已同步'; p.classList.add('ok'); return; }
+  if (status === 'error'){ p.textContent = '● 同步錯誤'; p.classList.add('err'); return; }
+  if (s.provider === 'none'){ p.textContent = '● 僅本地'; return; }
+  p.textContent = s.lastSync ? '● 已連線' : '● 待同步';
+}
+
+function syncConfigured(){
+  const s = state.settings.sync;
+  if (s.provider === 'supabase') return !!(s.supabaseUrl && s.supabaseKey && s.roomId);
+  if (s.provider === 'jsonbin')  return !!(s.jsonbinId && s.jsonbinKey);
+  return false;
+}
+
+async function cloudGet(){
+  const s = state.settings.sync;
+  if (s.provider === 'supabase'){
+    const base = s.supabaseUrl.replace(/\/+$/, '');
+    const url = `${base}/rest/v1/study_sync?room_id=eq.${encodeURIComponent(s.roomId)}&select=*`;
+    const res = await fetch(url, {
+      headers: { apikey: s.supabaseKey, Authorization: 'Bearer ' + s.supabaseKey }
+    });
+    if (!res.ok) throw new Error('Supabase 讀取失敗 ' + res.status);
+    const rows = await res.json();
+    if (!rows || !rows.length) return null;
+    return { data: rows[0].data, updatedAt: Number(rows[0].updated_at) || 0 };
+  }
+  if (s.provider === 'jsonbin'){
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${encodeURIComponent(s.jsonbinId)}/latest`, {
+      headers: { 'X-Master-Key': s.jsonbinKey }
+    });
+    if (!res.ok) throw new Error('JSONBin 讀取失敗 ' + res.status);
+    const j = await res.json();
+    const rec = j.record;
+    if (!rec) return null;
+    if (rec.data && rec.updatedAt !== undefined){
+      return { data: rec.data, updatedAt: Number(rec.updatedAt) || 0 };
+    }
+    return { data: rec, updatedAt: Number(rec.updatedAt) || 0 };
+  }
+  throw new Error('未設定同步後端');
+}
+
+async function cloudPut(){
+  const s = state.settings.sync;
+  if (s.provider === 'supabase'){
+    const base = s.supabaseUrl.replace(/\/+$/, '');
+    const res = await fetch(`${base}/rest/v1/study_sync?on_conflict=room_id`, {
+      method: 'POST',
+      headers: {
+        apikey: s.supabaseKey,
+        Authorization: 'Bearer ' + s.supabaseKey,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify({ room_id: s.roomId, data: state, updated_at: state.updatedAt })
+    });
+    if (!res.ok){
+      const txt = await res.text().catch(() => '');
+      throw new Error('Supabase 寫入失敗 ' + res.status + ' ' + txt.slice(0, 120));
+    }
+    return;
+  }
+  if (s.provider === 'jsonbin'){
+    const payload = { data: state, updatedAt: state.updatedAt };
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${encodeURIComponent(s.jsonbinId)}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': s.jsonbinKey },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('JSONBin 寫入失敗 ' + res.status);
+    return;
+  }
+  throw new Error('未設定同步後端');
+}
+
+let syncing = false;
+async function doSync(mode = 'auto', silent = false){
+  if (syncing) return;
+  if (!syncConfigured()){
+    if (!silent) toast('請先完成同步設定', 'error');
+    return;
+  }
+  syncing = true;
+  updateSyncPill('syncing');
+  try {
+    const cloud = await cloudGet();
+
+    if (mode === 'upload'){
+      await cloudPut();
+      state.settings.sync.lastSync = Date.now();
+      saveState();
+      updateSyncPill('ok');
+      if (!silent) toast('已上傳至雲端 ☁️', 'ok');
+    }
+    else if (mode === 'download'){
+      if (!cloud){ toast('雲端沒有資料', 'error'); }
+      else {
+        state = normalizeState(cloud.data);
+        state.settings.sync.lastSync = Date.now();
+        state.updatedAt = Date.now();
+        localStorage.setItem(LS_KEY, JSON.stringify(state));
+        applyTheme(); rerender(); updateSyncPill('ok');
+        if (!silent) toast('已從雲端下載 ⬇️', 'ok');
+      }
+    }
+    else {
+      if (!cloud){
+        await cloudPut();
+        state.settings.sync.lastSync = Date.now(); saveState();
+        updateSyncPill('ok');
+      } else if (state.updatedAt > (cloud.updatedAt || 0)){
+        await cloudPut();
+        state.settings.sync.lastSync = Date.now(); saveState();
+        updateSyncPill('ok');
+        if (!silent) toast('已同步（上傳）☁️', 'ok');
+      } else if ((cloud.updatedAt || 0) > state.updatedAt){
+        state = normalizeState(cloud.data);
+        state.settings.sync.lastSync = Date.now();
+        state.updatedAt = Date.now();
+        localStorage.setItem(LS_KEY, JSON.stringify(state));
+        applyTheme(); rerender();
+        updateSyncPill('ok');
+        if (!silent) toast('已同步（下載）⬇️', 'ok');
+      } else {
+        state.settings.sync.lastSync = Date.now(); saveState();
+        updateSyncPill('ok');
+        if (!silent) toast('已是最新狀態 ✅', 'ok');
+      }
+    }
+  } catch (err){
+    console.error(err);
+    updateSyncPill('error');
+    if (!silent) toast(err.message || '同步失敗', 'error');
+  } finally {
+    syncing = false;
+  }
+}
+
+/* ==================================================================
+   14. 主題 / 番茄鐘 / 日期
+   ================================================================== */
+function applyTheme(){
+  document.documentElement.dataset.theme = state.settings.theme;
+  const btn = $('#themeBtn');
+  btn.textContent = state.settings.theme === 'dark' ? '☀️ 淺色模式' : '🌙 深色模式';
+}
+function toggleTheme(){
+  state.settings.theme = state.settings.theme === 'dark' ? 'light' : 'dark';
+  saveState(); applyTheme();
+  if (currentView === 'settings') rerender();
+}
+
+const POMO_TOTAL = 25 * 60;
+let pomoLeft = POMO_TOTAL, pomoTimer = null, pomoRunning = false;
+function renderPomo(){
+  const m = Math.floor(pomoLeft / 60), s = pomoLeft % 60;
+  $('#pomoTime').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  $('#pomoPill').classList.toggle('running', pomoRunning);
+}
+function pomoTick(){
+  pomoLeft--;
+  if (pomoLeft <= 0){
+    pomoLeft = 0;
+    renderPomo();
+    clearInterval(pomoTimer); pomoTimer = null; pomoRunning = false;
+    renderPomo();
+    toast('🍅 25 分鐘完成！休息一下吧', 'ok');
+    beep();
+    return;
+  }
+  renderPomo();
+}
+function togglePomo(){
+  if (pomoRunning){
+    clearInterval(pomoTimer); pomoTimer = null; pomoRunning = false;
+  } else {
+    if (pomoLeft <= 0) pomoLeft = POMO_TOTAL;
+    pomoTimer = setInterval(pomoTick, 1000);
+    pomoRunning = true;
+  }
+  renderPomo();
+}
+function resetPomo(){
+  clearInterval(pomoTimer); pomoTimer = null; pomoRunning = false;
+  pomoLeft = POMO_TOTAL;
+  renderPomo();
+}
+function beep(){
+  try {
+    AudioEngine.init();
+    if (!AudioEngine.ctx) return;
+    AudioEngine.resume();
+    const ctx = AudioEngine.ctx, t = ctx.currentTime;
+    [880, 1174].forEach((f, i) => {
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = f;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, t + i * 0.18);
+      g.gain.linearRampToValueAtTime(0.16, t + i * 0.18 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0005, t + i * 0.18 + 0.4);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + i * 0.18); o.stop(t + i * 0.18 + 0.45);
+    });
+  } catch(e){}
+}
+
+function updateDatePill(){
+  const d = new Date();
+  const w = ['日','一','二','三','四','五','六'][d.getDay()];
+  $('#datePill').textContent = `${d.getMonth() + 1}月${d.getDate()}日 週${w}`;
+}
+
+/* ==================================================================
+   15. 初始化
+   ================================================================== */
+function init(){
+  loadState();
+  applyTheme();
+  buildNav();
+
+  $('#themeBtn').onclick = toggleTheme;
+  $('#menuBtn').onclick = () => {
+    $('#sidebar').classList.toggle('open');
+    $('#overlay').classList.toggle('show');
+  };
+  $('#overlay').onclick = () => {
+    $('#sidebar').classList.remove('open');
+    $('#overlay').classList.remove('show');
+  };
+
+  $('#pomoPill').onclick = togglePomo;
+  $('#pomoReset').onclick = resetPomo;
+  renderPomo();
+  updateDatePill();
+  setInterval(updateDatePill, 60000);
+
+  navigate('dashboard');
+  updateSyncPill();
+
+  setInterval(() => {
+    if (state.settings.sync.provider !== 'none' && state.settings.sync.auto !== false) doSync('auto', true);
+  }, 60000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && state.settings.sync.provider !== 'none' && state.settings.sync.auto !== false){
+      doSync('auto', true);
+    }
+  });
+  window.addEventListener('online', () => {
+    if (state.settings.sync.provider !== 'none' && state.settings.sync.auto !== false){
+      toast('網路已恢復，正在同步…');
+      doSync('auto', true);
+    }
+  });
+  window.addEventListener('offline', () => updateSyncPill('error'));
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
